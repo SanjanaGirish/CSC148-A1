@@ -71,8 +71,6 @@ class GameBoard:
     # === Private Attributes ===
     # _player:
     #   the player of the game
-    # _racoon:
-    #   the racoon
     # TODO Task #1 add any other private attribute(s) you need to keep track
     #  of the Characters on this board.
 
@@ -81,7 +79,6 @@ class GameBoard:
     width: int
     height: int
     _player: Optional[Player]
-    _racoon: Optional[Raccoon]
 
     def __init__(self, w: int, h: int) -> None:
         """Initialize this Board to be of the given width <w> and height <h> in
