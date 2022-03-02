@@ -190,13 +190,13 @@ class GameBoard:
         # TODO Task #1
         game_state = []
         for j in range(0, self.height):
-            #ith row to be appended to the return list
+            # ith row to be appended to the return list
             row = []
             for i in range(0, self.width):
                 if len(self.at(i, j)) == 0:
                     row.append('-')
                 elif len(self.at(i, j)) == 2:
-                    #only way this is possible is if Racoon is in Garbage can
+                    # only way this is possible is if Racoon is in Garbage can
                     row.append('@')
                 else:
                     character = self.at(i, j)[0]
@@ -225,6 +225,7 @@ class GameBoard:
         """
         # TODO Task #1
         final_str = ''
+
         for row in range(0, self.height):
             for column in range(0, self.width):
                 final_str += self.to_grid()[row][column]
@@ -368,9 +369,9 @@ class GameBoard:
         """
         # TODO Task #3 (you can leave calculating the score until Task #5)
         racoons_trapped = 0
-        for row in range(0, self.height):
-            for column in range(0, self.width):
-                if Raccoon in self._grid[column][row]:
+        for i in range(0, self.width):
+            for j in range(0, self.height):
+                if Raccoon in self._grid[i][j]:
                     racoons_trapped += 1
         # Can test the line below only after TASK 5 is implemented
         # return racoons_trapped * 10 + self.adjacent_bin_score()
@@ -519,32 +520,30 @@ class RecyclingBin(Character):
         True
         """
         # TODO Task #2
-        if self.x + direction[0] >= self.board.width or self.y + direction[1] \
-                >= self.board.height:
+        next_x = self.x + direction[0]  # the next location you want to move to
+        next_y = self.y + direction[1]
+
+        # if desired location is within board
+        if not self.board.on_board(next_x, next_y):
             return False
-        # If the target spot is not occupied
-        if len(self.board.at(self.x +
-                             direction[0], self.y + direction[1])) == 0:
-            self.x += direction[0]
-            self.y += direction[1]
+
+        # If the target spot is not occupied with any character, move
+        if len(self.board.at(next_x, next_y)) == 0:
+            self.x, self.y = next_x, next_y
             return True
-        # If the target spot contains a nonempty GarbageCan
-        if len(self.board.at(self.x +
-                             direction[0], self.y + direction[1])) == 2:
-            return False
-        # If the target spot consists of one character thats not a recycling bin
-        if not isinstance(self.board.at(self.x +
-                                        direction[0], self.y + direction[1])[0],
-                          RecyclingBin):
-            return False
-        # Finally, if the target spot contains a recycling bin:
-        if self.board.at(self.x + direction[0],
-                         self.y + direction[1])[0].move(direction):
-            self.x += direction[0]
-            self.y += direction[1]
-            return True
-        else:
-            return False
+
+        # character present where we want to move
+        char_next = self.board.at(next_x, next_y)[0]
+
+        # when there is a recycling bin, no other character can be there too
+        if isinstance(char_next, RecyclingBin):
+            if char_next.move(direction):
+                self.x, self.y = next_x, next_y
+                # move the recycle bin 1 position
+                return True
+
+        # if none of these options, move was not successful
+        return False
 
     def get_char(self) -> chr:
         """
@@ -729,7 +728,6 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #3
-
 
     def move(self, direction: Tuple[int, int]) -> bool:
         """Attempt to move this Raccoon in <direction> and return whether
