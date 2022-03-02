@@ -187,6 +187,21 @@ class GameBoard:
         [['P', '-', '-'], ['-', 'R', 'C']]
         """
         # TODO Task #1
+        game_state = []
+        for i in range(self.height):
+            #ith row to be appended to the return list
+            row = []
+            for j in range(self.width):
+                if len(self.at(j, i)) == 0:
+                    row.append('-')
+                elif len(self.at(j, i)) == 2:
+                    #only way this is possible is if Racoon is in Garbage can
+                    row.append('@')
+                else:
+                    character = self.at(j, i)[0]
+                    row.append(character.get_char())
+            game_state.append(row)
+        return game_state[:]
 
     def __str__(self) -> str:
         """
@@ -211,7 +226,7 @@ class GameBoard:
         final_str = ''
         for row in range(0, self.height):
             for column in range(0, self.width):
-                final_str += self.to_grid[row][column]
+                final_str += self.to_grid()[row][column]
             final_str += '\n'
         return final_str[:-1]
 
@@ -495,6 +510,32 @@ class RecyclingBin(Character):
         True
         """
         # TODO Task #2
+        if self.x + direction[0] >= self.board.width or self.y + direction[1] \
+                >= self.board.height:
+            return False
+        # If the target spot is not occupied
+        if len(self.board.at(self.x +
+                             direction[0], self.y + direction[1])) == 0:
+            self.x += direction[0]
+            self.y += direction[1]
+            return True
+        # If the target spot contains a nonempty GarbageCan
+        if len(self.board.at(self.x +
+                             direction[0], self.y + direction[1])) == 2:
+            return False
+        # If the target spot consists of one character thats not a recycling bin
+        if not isinstance(self.board.at(self.x +
+                                        direction[0], self.y + direction[1])[0],
+                          RecyclingBin):
+            return False
+        # Finally, if the target spot contains a recycling bin:
+        if self.board.at(self.x + direction[0],
+                         self.y + direction[1])[0].move(direction):
+            self.x += direction[0]
+            self.y += direction[1]
+            return True
+        else:
+            return False
 
     def get_char(self) -> chr:
         """
@@ -587,6 +628,36 @@ class Player(TurnTaker):
         True
         """
         # TODO Task #2
+        if self.x  \
+                + direction[0] >= self.board.width or self.y \
+                + direction[1] >= self.board.height:
+            return False
+        # Tile is empty
+        if len(self.board.at(self.x + direction[0], self.y + direction[1])) \
+                == 0:
+            self.x += direction[0]
+            self.y += direction[1]
+            return True
+        # Tile is covered by a nonempty GarbageCan
+        if len(self.board.at(self.x + direction[0], self.y + direction[1])) \
+                == 2:
+            return False
+        # Tile is covered by a character not a recycling bin
+        if not isinstance(self.board.at(self.x + direction[0],
+                                        self.y + direction[1])[0],
+                          RecyclingBin):
+            if isinstance(self.board.at(self.x, self.y)[0], GarbageCan):
+                self.board.at(self.x, self.y)[0].locked = False
+            return False
+        # Now we can assume self.board.at(self.x + direction[0],
+        # self.y + direction[1])[0] is a recycling bin
+        if self.board.at(self.x + direction[0],
+                         self.y + direction[1])[0].move(direction):
+            self.x += direction[0]
+            self.y += direction[1]
+            return True
+        else:
+            return False
 
     def get_char(self) -> chr:
         """
