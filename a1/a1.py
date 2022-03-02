@@ -110,9 +110,9 @@ class GameBoard:
         self._player = None
         # TODO Task #1 initialize any other private attributes you added.
         self._grid = {}
-        # i represents row, j represents column
-        for i in range(0, self.height):
-            for j in range(0, self.width):
+        # i represents x coordiante, j represents y coordinate
+        for i in range(0, self.width):
+            for j in range(0, self.height):
                 self._grid[(i, j)] = []
 
     def place_character(self, c: Character) -> None:
@@ -189,10 +189,10 @@ class GameBoard:
         """
         # TODO Task #1
         game_state = []
-        for i in range(self.height):
+        for j in range(0, self.height):
             #ith row to be appended to the return list
             row = []
-            for j in range(self.width):
+            for i in range(0, self.width):
                 if len(self.at(i, j)) == 0:
                     row.append('-')
                 elif len(self.at(i, j)) == 2:
@@ -200,7 +200,6 @@ class GameBoard:
                     row.append('@')
                 else:
                     character = self.at(i, j)[0]
-                    print(character)
                     row.append(character.get_char())
             game_state.append(row)
         return game_state[:]
@@ -368,6 +367,13 @@ class GameBoard:
         True
         """
         # TODO Task #3 (you can leave calculating the score until Task #5)
+        racoons_trapped = 0
+        for row in range(0, self.height):
+            for column in range(0, self.width):
+                if Raccoon in self._grid[column][row]:
+                    racoons_trapped += 1
+        # Can test the line below only after TASK 5 is implemented
+        # return racoons_trapped * 10 + self.adjacent_bin_score()
 
     def adjacent_bin_score(self) -> int:
         """
@@ -723,6 +729,7 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #3
+
 
     def move(self, direction: Tuple[int, int]) -> bool:
         """Attempt to move this Raccoon in <direction> and return whether
