@@ -110,6 +110,7 @@ class GameBoard:
         self._player = None
         # TODO Task #1 initialize any other private attributes you added.
         self._grid = {}
+        # i represents row, j represents column
         for i in range(0, self.height):
             for j in range(0, self.width):
                 self._grid[(i, j)] = []
@@ -192,13 +193,14 @@ class GameBoard:
             #ith row to be appended to the return list
             row = []
             for j in range(self.width):
-                if len(self.at(j, i)) == 0:
+                if len(self.at(i, j)) == 0:
                     row.append('-')
-                elif len(self.at(j, i)) == 2:
+                elif len(self.at(i, j)) == 2:
                     #only way this is possible is if Racoon is in Garbage can
                     row.append('@')
                 else:
-                    character = self.at(j, i)[0]
+                    character = self.at(i, j)[0]
+                    print(character)
                     row.append(character.get_char())
             game_state.append(row)
         return game_state[:]
@@ -323,6 +325,7 @@ class GameBoard:
         # TODO Task #2 make the player take a turn by adding
         #      a line of code here
         self.turns += 1  # PROVIDED, DO NOT CHANGE
+        self._player.take_turn()
 
         if self.turns % RACCOON_TURN_FREQUENCY == 0:  # PROVIDED, DO NOT CHANGE
             pass  # TODO Task #4 replace pass with code here to make each
@@ -628,7 +631,7 @@ class Player(TurnTaker):
         True
         """
         # TODO Task #2
-        if self.x  \
+        if self.x \
                 + direction[0] >= self.board.width or self.y \
                 + direction[1] >= self.board.height:
             return False
