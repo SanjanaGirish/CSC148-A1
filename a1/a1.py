@@ -71,14 +71,19 @@ class GameBoard:
     # === Private Attributes ===
     # _player:
     #   the player of the game
+    # _racoon:
+    #   the racoon
     # TODO Task #1 add any other private attribute(s) you need to keep track
     #  of the Characters on this board.
+    # _grid:
+    #   grid of the gameboard
 
     ended: bool
     turns: int
     width: int
     height: int
     _player: Optional[Player]
+    _grid: dict[(int, int), List[Optional[Character]]]
 
     def __init__(self, w: int, h: int) -> None:
         """Initialize this Board to be of the given width <w> and height <h> in
@@ -104,7 +109,10 @@ class GameBoard:
 
         self._player = None
         # TODO Task #1 initialize any other private attributes you added.
-        self._racoon = None
+        self._grid = {}
+        for i in range(0, self.height):
+            for j in range(0, self.width):
+                self._grid[(i, j)] = []
 
     def place_character(self, c: Character) -> None:
         """Record that character <c> is on this board.
@@ -130,6 +138,7 @@ class GameBoard:
         True
         """
         # TODO Task #1
+        self._grid[(c.x, c.y)].append(c)
 
     def at(self, x: int, y: int) -> List[Character]:
         """Return the characters at tile (x, y).
@@ -153,6 +162,7 @@ class GameBoard:
         True
         """
         # TODO Task #1
+        return self._grid[(x, y)]
 
     def to_grid(self) -> List[List[chr]]:
         """
@@ -198,6 +208,12 @@ class GameBoard:
         'P--\\n-RO'
         """
         # TODO Task #1
+        final_str = ''
+        for row in range(0, self.height):
+            for column in range(0, self.width):
+                final_str += self.to_grid[row][column]
+            final_str += '\n'
+        return final_str[:-1]
 
     def setup_from_grid(self, grid: str) -> None:
         """
@@ -834,9 +850,11 @@ def get_neighbours(tile: Tuple[int, int]) -> List[Tuple[int, int]]:
 
 if __name__ == '__main__':
     import doctest
+
     doctest.testmod()
 
     import python_ta
+
     python_ta.check_all(config={
         'allowed-io': [],
         'allowed-import-modules': ['doctest', 'python_ta', 'typing',
