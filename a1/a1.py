@@ -414,6 +414,14 @@ class GameBoard:
         """
         # TODO Task #5
 
+    # helper function that moves the character
+    def move_character(self, char: Character,
+                       pos1: Tuple[int, int], pos2: Tuple[int, int]) -> None:
+        """ Update the character character position from one to next
+        """
+        self._grid[(pos1)].remove(char)
+        self._grid[(pos2)].append(char)
+
 
 class Character:
     """A character that has (x,y) coordinates and is associated with a given
@@ -529,6 +537,8 @@ class RecyclingBin(Character):
 
         # If the target spot is not occupied with any character, move
         if len(self.board.at(next_x, next_y)) == 0:
+            self.board.move_character(self,
+                                      (self.x, self.y), (next_x, next_y))
             self.x, self.y = next_x, next_y
             return True
 
@@ -538,6 +548,8 @@ class RecyclingBin(Character):
         # when there is a recycling bin, no other character can be there too
         if isinstance(char_next, RecyclingBin):
             if char_next.move(direction):
+                self.board.move_character(self,
+                                          (self.x, self.y), (next_x, next_y))
                 self.x, self.y = next_x, next_y
                 # move the recycle bin 1 position
                 return True
@@ -636,36 +648,41 @@ class Player(TurnTaker):
         True
         """
         # TODO Task #2
-        if self.x \
-                + direction[0] >= self.board.width or self.y \
-                + direction[1] >= self.board.height:
+        next_x = self.x + direction[0]
+        next_y = self.y + direction[1]
+
+        # check if not on board
+        if not self.board.on_board(next_x, next_y):
             return False
+
         # Tile is empty
-        if len(self.board.at(self.x + direction[0], self.y + direction[1])) \
-                == 0:
-            self.x += direction[0]
-            self.y += direction[1]
+        if len(self.board.at(next_x, next_y)) == 0:
+            self.board.move_character(self,
+                                      (self.x, self.y), (next_x, next_y))
+            self.x, self.y = next_x, next_y
             return True
-        # Tile is covered by a nonempty GarbageCan
-        if len(self.board.at(self.x + direction[0], self.y + direction[1])) \
-                == 2:
-            return False
-        # Tile is covered by a character not a recycling bin
-        if not isinstance(self.board.at(self.x + direction[0],
-                                        self.y + direction[1])[0],
-                          RecyclingBin):
-            if isinstance(self.board.at(self.x, self.y)[0], GarbageCan):
-                self.board.at(self.x, self.y)[0].locked = False
-            return False
-        # Now we can assume self.board.at(self.x + direction[0],
-        # self.y + direction[1])[0] is a recycling bin
-        if self.board.at(self.x + direction[0],
-                         self.y + direction[1])[0].move(direction):
-            self.x += direction[0]
-            self.y += direction[1]
-            return True
-        else:
-            return False
+
+        # character present where we want to move
+        for char_next in self.board.at(next_x, next_y):
+
+            # If the new tile is occupied by a locked GarbageCan
+            if isinstance(char_next, GarbageCan):
+                if char_next.locked:
+                    return False
+            #If a Player attempts to move towards an empty, unlocked GarbageCan
+                else:
+                    if not len(self.board.at(next_x, next_y)) == 2:
+                        char_next.locked = True
+                        return True
+
+            # when there is a recycling bin, no other character can be there too
+            if isinstance(char_next, RecyclingBin):
+                if char_next.move(direction):
+                    self.board.move_character(self, (self.x, self.y),
+                                              (next_x, next_y))
+                    self.x, self.y = next_x, next_y
+                    # move the recycle bin 1 position
+                    return True
 
     def get_char(self) -> chr:
         """
