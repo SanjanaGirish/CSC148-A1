@@ -369,10 +369,9 @@ class GameBoard:
         """
         # TODO Task #3 (you can leave calculating the score until Task #5)
         racoons_trapped = 0
-        for i in range(0, self.width):
-            for j in range(0, self.height):
-                if Raccoon in self._grid[i][j]:
-                    racoons_trapped += 1
+        # for pos, chars_lst in self._grid:
+        #     if Raccoon in chars_lst and GarbageCan in chars_lst:
+        #         self.ended = True
         # Can test the line below only after TASK 5 is implemented
         # return racoons_trapped * 10 + self.adjacent_bin_score()
 
@@ -665,13 +664,19 @@ class Player(TurnTaker):
         # character present where we want to move
         for char_next in self.board.at(next_x, next_y):
 
+            # If the new tile is occupied by a Racooon
+            if isinstance(char_next, Raccoon):
+                return False
+
             # If the new tile is occupied by a locked GarbageCan
             if isinstance(char_next, GarbageCan):
                 if char_next.locked:
                     return False
-            #If a Player attempts to move towards an empty, unlocked GarbageCan
+
+                # If a Player attempts to move towards an empty,
+                # unlocked GarbageCan
                 else:
-                    if not len(self.board.at(next_x, next_y)) == 2:
+                    if not len(self.board.at(next_x, next_y)) == 2:  # empty
                         char_next.locked = True
                         return True
 
