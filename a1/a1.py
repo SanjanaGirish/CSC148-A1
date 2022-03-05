@@ -139,6 +139,8 @@ class GameBoard:
         True
         """
         # TODO Task #1
+        if isinstance(c, Player):
+            self._player = c
         self._grid[(c.x, c.y)].append(c)
 
     def at(self, x: int, y: int) -> List[Character]:
