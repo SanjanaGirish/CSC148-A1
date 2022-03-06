@@ -371,9 +371,16 @@ class GameBoard:
         """
         # TODO Task #3 (you can leave calculating the score until Task #5)
         racoons_trapped = 0
-        # for pos, chars_lst in self._grid:
-        #     if Raccoon in chars_lst and GarbageCan in chars_lst:
-        #         self.ended = True
+        for pos, chars_lst in self._grid.items():
+            for chars in chars_lst:
+                if isinstance(chars, Raccoon):
+                    if (not chars.check_trapped()) and \
+                            (not len(chars_lst) == 2):
+                        self.ended = False
+                        return None
+                    elif chars.check_trapped():
+                        racoons_trapped += 1
+        self.ended = True
         # Can test the line below only after TASK 5 is implemented
         # return racoons_trapped * 10 + self.adjacent_bin_score()
 
@@ -752,6 +759,21 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #3
+        racoon_location = (self.x, self.y)
+        four_sides = []
+        for direction in DIRECTIONS:
+            # stores coordinates of neighboring positions
+            four_sides.append((self.x + direction[0], self.y + direction[1]))
+
+        for element in four_sides:
+            # if neighboring position is on board
+            if self.board.on_board(element[0], element[1]):
+                chars = self.board.at(element[0], element[1])
+                # if empty or open Garbagecan
+                if (not chars) or (len(chars) == 1 and
+                                   isinstance(chars, GarbageCan)):
+                    return False
+        return True
 
     def move(self, direction: Tuple[int, int]) -> bool:
         """Attempt to move this Raccoon in <direction> and return whether
