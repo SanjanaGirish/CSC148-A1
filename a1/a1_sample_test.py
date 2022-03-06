@@ -30,6 +30,22 @@ from a1 import *
 # We use this in one of the tests below. You can use it in your own testing, but
 # you do not have to.
 SIMPLE_BOARD_STRING = 'P-B-\n-BRB\n--BB\n-C--'
+WIDTH_MORE_THAN_HEIGHT_STRING = 'P-B-\n-BRB\n--BB'
+HEIGHT_MORE_THAN_WIDTH_STRING = 'P@B\n-BB\nRBB\nBB-'
+
+
+def width_more_than_height_setup() -> GameBoard:
+    """Set up a game board with width greater than height"""
+    b = GameBoard(4, 3)
+    b.setup_from_grid(WIDTH_MORE_THAN_HEIGHT_STRING)
+    return b
+
+
+def height_more_than_width_setup()-> GameBoard:
+    """Set up a game board with height greater than width"""
+    b = GameBoard(3,4)
+    b.setup_from_grid(HEIGHT_MORE_THAN_WIDTH_STRING)
+    return b
 
 
 def simple_board_setup() -> GameBoard:
@@ -59,8 +75,20 @@ def test_simple_str() -> None:
     """Test GameBoard.__str__ for the simple board in SIMPLE_BOARD_STRING."""
     b = simple_board_setup()
     assert str(b) == 'P-B-\n-BRB\n--BB\n-C--'
+    
+    
+def test_width_greater_height_str() -> None:
+    """Test GameBoard.__str__ for a board with width more than height"""
+    b = width_more_than_height_setup()
+    assert str(b) == WIDTH_MORE_THAN_HEIGHT_STRING
 
+    
+def test_height_greater_width_str() -> None:
+    """Test GameBoard.__str__ for a board with height more than width"""
+    b = height_more_than_width_setup()
+    assert str(b) == HEIGHT_MORE_THAN_WIDTH_STRING
 
+    
 def test_simple_check_game_end() -> None:
     """Test GameBoard.check_game_end on the docstring example"""
     b = GameBoard(3, 2)
