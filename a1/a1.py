@@ -820,6 +820,45 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #4
+        next_x = self.x + direction[0]
+        next_y = self.y + direction[1]
+
+        # check if next tile is on board
+        if not self.board.on_board(next_x, next_y):
+            return False
+
+        # If the tile one tile over in that direction is occupied by the Player,
+        #         a RecyclingBin, or another Raccoon,
+        #         do nothing and return False.
+        chars_lst = self.board.at(next_x, next_y)
+
+        # if tile is empty
+        if not chars_lst:
+            self.board.move_character(self, (self.x, self.y),
+                                      (next_x, next_y))
+            self.x, self.y = next_x, next_y
+            return True
+
+        for chars in chars_lst:
+            if isinstance(chars, Player):
+                return False
+            elif isinstance(chars, RecyclingBin):
+                return False
+            elif isinstance(chars, Raccoon):
+                return False
+
+            # If the tile is occupied by an unlocked GarbageCan that has
+            # no Raccoon in it
+            elif isinstance(chars, GarbageCan) and len(chars_lst) == 1:
+                if not chars.locked:
+                    self.board.move_character(self, (self.x, self.y),
+                                              (next_x, next_y))
+                    self.x, self.y = next_x, next_y
+                    self.inside_can = True
+                    return False
+                else:
+                    chars.locked = False
+                    return True
 
     def take_turn(self) -> None:
         """Take a turn in the game.
