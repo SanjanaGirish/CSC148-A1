@@ -146,8 +146,31 @@ def test_simple_raccoon_check_trapped() -> None:
     assert not r.check_trapped()
     RecyclingBin(b, 1, 1)
     assert r.check_trapped()
+    
+    
+def test_corner_raccoon_check_trapped() -> None:
+    """Test Raccoon.check_trapped when raccoon is in top-left corner"""
+    b = GameBoard(3,3)
+    r = Raccoon(b, 0, 0)
+    Player(b, 1, 0)
+    RecyclingBin(b, 0, 1)
+    assert r.check_trapped()
 
 
+def test_garbage_can_raccoon_check_trapped() -> None:
+    """Test Raccoon.check_trapped when raccoon can move into an open garbage
+    can. Also tests the case, when raccoon is not at an edge"""
+    b = GameBoard(3, 3)
+    r = Raccoon(b, 1, 1)
+    Player(b, 1, 0)
+    RecyclingBin(b, 0, 1)
+    g = GarbageCan(b, 1, 2, False)
+    Raccoon(b, 2, 1)
+    assert not r.check_trapped()
+    g.locked = True
+    assert r.check_trapped()
+
+    
 def test_simple_raccoon_move() -> None:
     """Test Raccoon.move on docstring example."""
     b = GameBoard(4, 2)
