@@ -961,7 +961,68 @@ class SmartRaccoon(Raccoon):
         True
         """
         # TODO Task #4
+        closest_garbage_can_directions = self._closest_garbage_can()
+        if self.inside_can:
+            return
+        for direction in closest_garbage_can_directions:
+            if Raccoon.move(self, direction):
+                return
+        Raccoon.take_turn(self)
 
+   def _closest_garbage_can(self) -> List[Tuple[int, int]]:
+        """Helper method that returns a list of directions, sorted by the
+        distance of the closest garbage can in that direction
+        >>> b = GameBoard(5,5)
+        >>> s = SmartRaccoon(b, 2, 3)
+        >>> _ = GarbageCan(b, 0, 3, False)
+        >>> s._closest_garbage_can()
+        [(-1, 0), (0, -1), (1, 0), (0, 1)]
+        >>> y = GarbageCan(b, 3, 3, False)
+        >>> s._closest_garbage_can()
+        [(1, 0), (-1, 0), (0, -1), (0, 1)]
+        >>> z = GarbageCan(b, 1, 3, False)
+        >>> s._closest_garbage_can()
+        [(-1, 0), (1, 0), (0, -1), (0, 1)]
+        >>> r = SmartRaccoon(b, 0, 2)
+        >>> r._closest_garbage_can()
+        [(0, 1), (-1, 0), (0, -1), (1, 0)]
+        """
+        distances = {direction: float('inf') for direction in DIRECTIONS}
+        sorted_directions = DIRECTIONS[:]
+        # the for loops are to update distances[direction] with the distance of
+        # the closest garbage can in the line of sight of direction
+        for j in range(self.x, self.board.width):
+            if len(self.board.at(j, self.y)) == 1 and isinstance(
+                    self.board.at(j, self.y)[0], GarbageCan):
+                if not self.board.at(j, self.y)[0].locked:
+                    distances[RIGHT] = j - self.x
+                    break
+        for j in range(self.x, -1, -1):
+            if len(self.board.at(j, self.y)) == 1 and isinstance(
+                    self.board.at(j, self.y)[0], GarbageCan):
+                if not self.board.at(j, self.y)[0].locked:
+                    distances[LEFT] = self.x - j
+                    break
+        for j in range(self.y, -1, -1):
+            if len(self.board.at(self.x, j)) == 1 and isinstance(
+                    self.board.at(self.x, j)[0], GarbageCan):
+                if not self.board.at(self.x, j)[0].locked:
+                    distances[UP] = self.y - j
+                    break
+        for j in range(self.y, self.board.height):
+            if len(self.board.at(self.x, j)) == 1 and isinstance(
+                    self.board.at(self.x, j)[0], GarbageCan):
+                if not self.board.at(self.x, j)[0].locked:
+                    distances[DOWN] = j - self.y
+                    break
+        # using bubble sort to sort sorted_directions
+        for i in range(4):
+            for j in range(4 - i - 1):
+                if distances[sorted_directions[j]] > distances[sorted_directions[j + 1]]:
+                    sorted_directions[j], sorted_directions[j + 1] = \
+                        sorted_directions[j + 1], sorted_directions[j]
+        return sorted_directions
+    
     def get_char(self) -> chr:
         """
         Return '@' to represent that this SmartRaccoon is inside a Garbage Can
