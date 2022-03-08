@@ -774,10 +774,7 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #3
-        four_sides = []
-        for direction in DIRECTIONS:
-            # stores coordinates of neighboring positions
-            four_sides.append((self.x + direction[0], self.y + direction[1]))
+        four_sides = get_neighbours((self.x, self.y))
 
         for element in four_sides:
             # if neighboring position is on board
