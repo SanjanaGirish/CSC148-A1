@@ -345,8 +345,12 @@ class GameBoard:
         self._player.take_turn()
 
         if self.turns % RACCOON_TURN_FREQUENCY == 0:  # PROVIDED, DO NOT CHANGE
-            pass  # TODO Task #4 replace pass with code here to make each
+            # TODO Task #4 replace pass with code here to make each
             #            raccoon take a turn
+            for char_lst in self._grid.values():
+                for char in char_lst:
+                    if isinstance(char, Raccoon):
+                        char.take_turn()
 
         self.check_game_end()  # PROVIDED, DO NOT CHANGE
 
@@ -698,10 +702,10 @@ class Player(TurnTaker):
 
                 # If a Player attempts to move towards an empty,
                 # unlocked GarbageCan
-                else:
-                    if not len(self.board.at(next_x, next_y)) == 2:  # empty
-                        char_next.locked = True
-                        return True
+                elif (not char_next.locked) and \
+                        not len(self.board.at(next_x, next_y)) == 2:  # empty
+                    char_next.locked = True
+                    return True
 
             # when there is a recycling bin, no other character can be there too
             if isinstance(char_next, RecyclingBin):
@@ -969,7 +973,7 @@ class SmartRaccoon(Raccoon):
                 return
         Raccoon.take_turn(self)
 
-   def _closest_garbage_can(self) -> List[Tuple[int, int]]:
+    def _closest_garbage_can(self) -> List[Tuple[int, int]]:
         """Helper method that returns a list of directions, sorted by the
         distance of the closest garbage can in that direction
         >>> b = GameBoard(5,5)
@@ -1018,11 +1022,12 @@ class SmartRaccoon(Raccoon):
         # using bubble sort to sort sorted_directions
         for i in range(4):
             for j in range(4 - i - 1):
-                if distances[sorted_directions[j]] > distances[sorted_directions[j + 1]]:
+                if distances[sorted_directions[j]] > distances[
+                    sorted_directions[j + 1]]:
                     sorted_directions[j], sorted_directions[j + 1] = \
                         sorted_directions[j + 1], sorted_directions[j]
         return sorted_directions
-    
+
     def get_char(self) -> chr:
         """
         Return '@' to represent that this SmartRaccoon is inside a Garbage Can
