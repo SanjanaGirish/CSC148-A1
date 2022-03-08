@@ -894,6 +894,13 @@ class Raccoon(TurnTaker):
         (2, 1)
         """
         # TODO Task #4
+        if self.inside_can:
+            return
+        new_directions = get_shuffled_directions()
+        for direction in new_directions:
+            # moves the raccoon to the first direction where it can legally move
+            if self.move(direction):
+                break
 
     def get_char(self) -> chr:
         """
