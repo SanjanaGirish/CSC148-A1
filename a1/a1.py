@@ -139,9 +139,24 @@ class GameBoard:
         True
         """
         # TODO Task #1
+        # if it is a player, initialise it
         if isinstance(c, Player):
             self._player = c
-        self._grid[(c.x, c.y)].append(c)
+
+        # if there is no another character there
+        if len(self.at(c.x, c.y)) == 0:
+            self._grid[(c.x, c.y)].append(c)
+
+        # if a character is there
+        chars_lst = self.at(c.x, c.y)
+
+        # if it is a racoon
+        if isinstance(c, Raccoon):
+            # if there is ONLY an open garbagecan there
+            char = chars_lst[0]
+            if len(chars_lst) == 1 and isinstance(char, GarbageCan):
+                if not char.locked:
+                    self._grid[(c.x, c.y)].append(c)
 
     def at(self, x: int, y: int) -> List[Character]:
         """Return the characters at tile (x, y).
@@ -371,18 +386,17 @@ class GameBoard:
         """
         # TODO Task #3 (you can leave calculating the score until Task #5)
         racoons_trapped = 0
-        for pos, chars_lst in self._grid.items():
+        for chars_lst in self._grid.values():
             for chars in chars_lst:
-                if isinstance(chars, Raccoon):
-                    if (not chars.check_trapped()) and \
-                            (not len(chars_lst) == 2):
-                        self.ended = False
-                        return None
-                    elif chars.check_trapped():
-                        racoons_trapped += 1
+                if isinstance(chars, Raccoon) and (not chars.check_trapped()) \
+                        and (not len(chars_lst) == 2):
+                    self.ended = False
+                    return None
+                elif isinstance(chars, Raccoon) and chars.check_trapped():
+                    racoons_trapped += 1
         self.ended = True
         # Can test the line below only after TASK 5 is implemented
-        # return racoons_trapped * 10 + self.adjacent_bin_score()
+        return racoons_trapped * 10 + self.adjacent_bin_score()
 
     def adjacent_bin_score(self) -> int:
         """
@@ -697,6 +711,7 @@ class Player(TurnTaker):
                     self.x, self.y = next_x, next_y
                     # move the recycle bin 1 position
                     return True
+        return False
 
     def get_char(self) -> chr:
         """
@@ -759,7 +774,6 @@ class Raccoon(TurnTaker):
         True
         """
         # TODO Task #3
-        racoon_location = (self.x, self.y)
         four_sides = []
         for direction in DIRECTIONS:
             # stores coordinates of neighboring positions
@@ -770,8 +784,8 @@ class Raccoon(TurnTaker):
             if self.board.on_board(element[0], element[1]):
                 chars = self.board.at(element[0], element[1])
                 # if empty or open Garbagecan
-                if (not chars) or (len(chars) == 1 and
-                                   isinstance(chars, GarbageCan)):
+                if (not chars) or (len(chars) == 1
+                                   and isinstance(chars, GarbageCan)):
                     return False
         return True
 
@@ -855,10 +869,11 @@ class Raccoon(TurnTaker):
                                               (next_x, next_y))
                     self.x, self.y = next_x, next_y
                     self.inside_can = True
-                    return False
+                    return True
                 else:
                     chars.locked = False
                     return True
+        return False
 
     def take_turn(self) -> None:
         """Take a turn in the game.
