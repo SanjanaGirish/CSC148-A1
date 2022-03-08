@@ -180,7 +180,9 @@ class GameBoard:
         True
         """
         # TODO Task #1
-        return self._grid[(x, y)]
+        if self.on_board(x, y):
+            return self._grid[(x, y)]
+        return []
 
     def to_grid(self) -> List[List[chr]]:
         """
@@ -898,13 +900,13 @@ class Raccoon(TurnTaker):
         (2, 1)
         """
         # TODO Task #4
-        if self.inside_can:
-            return
-        new_directions = get_shuffled_directions()
-        for direction in new_directions:
-            # moves the raccoon to the first direction where it can legally move
-            if self.move(direction):
-                break
+        if not self.inside_can:
+            new_directions = get_shuffled_directions()
+            for direction in new_directions:
+                # moves the raccoon to the first direction where
+                # it can legally move
+                if self.move(direction):
+                    return
 
     def get_char(self) -> chr:
         """
@@ -965,6 +967,7 @@ class SmartRaccoon(Raccoon):
         True
         """
         # TODO Task #4
+        # If a SmartRaccoon is in a GarbageCan, it stays where it is.
         closest_garbage_can_directions = self._closest_garbage_can()
         if self.inside_can:
             return
