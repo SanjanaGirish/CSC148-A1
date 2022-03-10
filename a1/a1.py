@@ -73,7 +73,7 @@ class GameBoard:
     #   the player of the game
     # _racoon:
     #   the racoon
-    # TODO Task #1 add any other private attribute(s) you need to keep track
+    # Task #1 add any other private attribute(s) you need to keep track
     #  of the Characters on this board.
     # _grid:
     #   grid of the gameboard
@@ -108,7 +108,7 @@ class GameBoard:
         self.height = h
 
         self._player = None
-        # TODO Task #1 initialize any other private attributes you added.
+        # Task #1 initialize any other private attributes you added.
         self._grid = {}
         # i represents x coordiante, j represents y coordinate
         for i in range(0, self.width):
@@ -138,7 +138,7 @@ class GameBoard:
         >>> b.at(1, 1)[0] == r  # requires GameBoard.at be implemented to work
         True
         """
-        # TODO Task #1
+        # Task #1
         # if it is a player, initialise it
         if isinstance(c, Player):
             self._player = c
@@ -179,7 +179,7 @@ class GameBoard:
         >>> b.at(0, 1)[0] == p
         True
         """
-        # TODO Task #1
+        # Task #1
         if self.on_board(x, y):
             return self._grid[(x, y)]
         return []
@@ -206,7 +206,7 @@ class GameBoard:
         >>> b.to_grid()
         [['P', '-', '-'], ['-', 'R', 'C']]
         """
-        # TODO Task #1
+        # Task #1
         game_state = []
         for j in range(0, self.height):
             # ith row to be appended to the return list
@@ -242,7 +242,7 @@ class GameBoard:
         >>> str(b)
         'P--\\n-RO'
         """
-        # TODO Task #1
+        # Task #1
         final_str = ''
 
         for row in range(0, self.height):
@@ -341,24 +341,36 @@ class GameBoard:
         >>> (p.x, p.y) == (1, 0)  # Player moved right!
         True
         """
-        # TODO Task #2 make the player take a turn by adding
+        # Task #2 make the player take a turn by adding
         #      a line of code here
         self._player.take_turn()
         self.turns += 1  # PROVIDED, DO NOT CHANGE
 
         if self.turns % RACCOON_TURN_FREQUENCY == 0:  # PROVIDED, DO NOT CHANGE
-            # TODO Task #4 replace pass with code here to make each
+            # Task #4 replace pass with code here to make each
             #            raccoon take a turn
             lst_racoons = []
-            for char_lst in self._grid.values():
-                for char in char_lst:
-                    if isinstance(char, Raccoon) and not char.inside_can:
-                        lst_racoons.append(char)
+            all_chars = self.all_characters()
+            for char in all_chars:
+                if isinstance(char, Raccoon) and not char.inside_can:
+                    lst_racoons.append(char)
 
             for r in lst_racoons:
                 r.take_turn()
-                
+
         self.check_game_end()  # PROVIDED, DO NOT CHANGE
+
+    def all_characters(self) -> List[Character]:
+        """ Return a list of all characters on the game board
+        >>> g = GameBoard(3, 3)
+        >>> g.all_characters()
+        []
+        """
+        lst_of_chars = []
+        for char_lst in self._grid.values():
+            for char in char_lst:
+                lst_of_chars.append(char)
+        return lst_of_chars
 
     def handle_event(self, event: Tuple[int, int]) -> None:
         """Handle a user-input event.
@@ -394,7 +406,7 @@ class GameBoard:
         >>> b.ended
         True
         """
-        # TODO Task #3 (you can leave calculating the score until Task #5)
+        # Task #3 (you can leave calculating the score until Task #5)
         racoons_trapped = 0
         for chars_lst in self._grid.values():
             for chars in chars_lst:
@@ -446,12 +458,12 @@ class GameBoard:
         >>> b.adjacent_bin_score()
         5
         """
-        # TODO Task #5
+        # Task #5
         max_bins = 0
         for i in range(self.width):
             for j in range(self.height):
-                if not (self.at(i, j) == []) and isinstance(self.at(i, j)[0],
-                                                            RecyclingBin):
+                if (self.at(i, j) != []) and isinstance(self.at(i, j)[0],
+                                                        RecyclingBin):
                     current_bins = self.adjacent_bins(i, j, {})
                     max_bins = max(current_bins, max_bins)
         return max_bins
@@ -460,7 +472,12 @@ class GameBoard:
     # recycling bin
     def adjacent_bins(self, i: int, j: int, encountered: dict) -> int:
         """returns the number of bins that are adjacent to the recycling bin at
-        (i,j), returns 0, if no recycling bin in current square
+        (i,j), returns 0, if no recycling bin in current square. Encountered
+        bins are kept track of.
+        >>> g = GameBoard(3, 3)
+        >>> rb = RecyclingBin(g, 1, 1)
+        >>> g.adjacent_bins(1, 2, {})
+        0
         """
         b = 1
         for direction in DIRECTIONS:
@@ -602,7 +619,7 @@ class RecyclingBin(Character):
         >>> b.at(0, 1) == [rb]
         True
         """
-        # TODO Task #2
+        # Task #2
         next_x = self.x + direction[0]  # the next location you want to move to
         next_y = self.y + direction[1]
 
@@ -722,7 +739,7 @@ class Player(TurnTaker):
         >>> b.at(1, 1) == [p]
         True
         """
-        # TODO Task #2
+        # Task #2
         next_x = self.x + direction[0]
         next_y = self.y + direction[1]
 
@@ -826,7 +843,7 @@ class Raccoon(TurnTaker):
         >>> r.check_trapped()
         True
         """
-        # TODO Task #3
+        # Task #3
         four_sides = get_neighbours((self.x, self.y))
 
         for element in four_sides:
@@ -884,7 +901,7 @@ class Raccoon(TurnTaker):
         >>> len(b.at(1, 1)) == 2  # Raccoon and GarbageCan are both at (1, 1)!
         True
         """
-        # TODO Task #4
+        # Task #4
         next_x = self.x + direction[0]
         next_y = self.y + direction[1]
 
@@ -947,7 +964,7 @@ class Raccoon(TurnTaker):
         >>> r2.x, r2.y
         (2, 1)
         """
-        # TODO Task #4
+        # Task #4
         if not self.inside_can:
             new_directions = get_shuffled_directions()
             for direction in new_directions:
@@ -1014,7 +1031,7 @@ class SmartRaccoon(Raccoon):
         >>> s.x == 6
         True
         """
-        # TODO Task #4
+        # Task #4
         # If a SmartRaccoon is in a GarbageCan, it stays where it is.
         closest_garbage_can_directions = self._closest_garbage_can()
         if self.inside_can:
