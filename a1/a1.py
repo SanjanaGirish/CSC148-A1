@@ -349,11 +349,15 @@ class GameBoard:
         if self.turns % RACCOON_TURN_FREQUENCY == 0:  # PROVIDED, DO NOT CHANGE
             # TODO Task #4 replace pass with code here to make each
             #            raccoon take a turn
+            lst_racoons = []
             for char_lst in self._grid.values():
                 for char in char_lst:
-                    if isinstance(char, Raccoon):
-                        char.take_turn()
+                    if isinstance(char, Raccoon) and not char.inside_can:
+                        lst_racoons.append(char)
 
+            for r in lst_racoons:
+                r.take_turn()
+                
         self.check_game_end()  # PROVIDED, DO NOT CHANGE
 
     def handle_event(self, event: Tuple[int, int]) -> None:
@@ -443,37 +447,33 @@ class GameBoard:
         5
         """
         # TODO Task #5
-        # adj_bins = 0
-        # memory = []  # keeps track of all recycling bins already encountered
-        # for tiles, chars_lst in self._grid.items():   iterating each tile
-            # char = chars_lst[0]
-            # if isinstance(char, RecyclingBin) and (char not in memory):
-                # neighbors = get_neighbours(tiles)
-        # current_bins = 0
-        # max_bins = 0
+        max_bins = 0
         for i in range(self.width):
             for j in range(self.height):
-                if not (self.at(i, j) == []) and isinstance(self.at(i, j)[0], RecyclingBin):
+                if not (self.at(i, j) == []) and isinstance(self.at(i, j)[0],
+                                                            RecyclingBin):
                     current_bins = self.adjacent_bins(i, j, {})
                     max_bins = max(current_bins, max_bins)
         return max_bins
 
     # Helper function that calculates the adjacent recycling bins of a single
     # recycling bin
-    def adjacent_bins(self, i: int, j: int, encountered) -> int:
+    def adjacent_bins(self, i: int, j: int, encountered: dict) -> int:
         """returns the number of bins that are adjacent to the recycling bin at
         (i,j), returns 0, if no recycling bin in current square
         """
         b = 1
         for direction in DIRECTIONS:
             # checking if the current square has a recycling bin
-            if self.at(i, j) == [] or not isinstance(self.at(i, j)[0], RecyclingBin):
+            if self.at(i, j) == [] or not isinstance(self.at(i, j)[0],
+                                                     RecyclingBin):
                 return 0
             # if the adjacent square is in the board
             if self.on_board(i + direction[0], j + direction[1]):
                 encountered[(i, j)] = True
                 if (i + direction[0], j + direction[1]) not in encountered:
-                    b += self.adjacent_bins(i + direction[0], j + direction[1], encountered)
+                    b += self.adjacent_bins(i + direction[0], j + direction[1],
+                                            encountered)
         return b
 
     # helper function that moves the character
@@ -798,7 +798,7 @@ class Raccoon(TurnTaker):
         at tile (<x>, <y>). Initially a Raccoon is not inside
         of a GarbageCan, unless it is placed directly inside an open GarbageCan.
 
-        >>> r = Raccoon(GameBoard(5, 5), 5, 10)
+        >>> r = Raccoon(GameBoard(11, 11), 5, 10)
         """
         self.inside_can = False
         # since this raccoon may be placed inside an open garbage can,
@@ -832,10 +832,11 @@ class Raccoon(TurnTaker):
         for element in four_sides:
             # if neighboring position is on board
             if self.board.on_board(element[0], element[1]):
-                chars = self.board.at(element[0], element[1])
-                # if empty or open Garbagecan
-                if (not chars) or (len(chars) == 1
-                                   and isinstance(chars, GarbageCan)):
+                chars_lst = self.board.at(element[0], element[1])
+                # if empty or open Garbagecan with no racoon in it
+                if (not chars_lst) or (len(chars_lst) == 1
+                                       and isinstance(chars_lst[0], GarbageCan)
+                                       and not chars_lst[0].locked):
                     return False
         return True
 
@@ -975,7 +976,7 @@ class SmartRaccoon(Raccoon):
     SmartRaccoons move in the same way as Raccoons.
 
     === Sample Usage ===
-    >>> b = GameBoard(8, 1)
+    >>> b = GameBoard(8, 2)
     >>> s = SmartRaccoon(b, 4, 0)
     >>> s.x, s.y
     (4, 0)
