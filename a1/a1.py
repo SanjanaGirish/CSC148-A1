@@ -472,7 +472,7 @@ class GameBoard:
     # recycling bin
     def adjacent_bins(self, i: int, j: int, encountered: dict) -> int:
         """returns the number of bins that are adjacent to the recycling bin at
-        (i,j), returns 0, if no recycling bin in current square. Encountered
+        (i,j), returns 0, if no recycling bin in current square. encountered
         bins are kept track of.
         >>> g = GameBoard(3, 3)
         >>> rb = RecyclingBin(g, 1, 1)
