@@ -343,8 +343,8 @@ class GameBoard:
         """
         # TODO Task #2 make the player take a turn by adding
         #      a line of code here
-        self.turns += 1  # PROVIDED, DO NOT CHANGE
         self._player.take_turn()
+        self.turns += 1  # PROVIDED, DO NOT CHANGE
 
         if self.turns % RACCOON_TURN_FREQUENCY == 0:  # PROVIDED, DO NOT CHANGE
             # TODO Task #4 replace pass with code here to make each
@@ -394,10 +394,12 @@ class GameBoard:
         racoons_trapped = 0
         for chars_lst in self._grid.values():
             for chars in chars_lst:
+                # if it's a racoon, not trapped and not already in a can
                 if isinstance(chars, Raccoon) and (not chars.check_trapped()) \
                         and (not len(chars_lst) == 2):
                     self.ended = False
                     return None
+                # if it's a racoon and trapped
                 elif isinstance(chars, Raccoon) and chars.check_trapped():
                     racoons_trapped += 1
         self.ended = True
@@ -441,14 +443,33 @@ class GameBoard:
         5
         """
         # TODO Task #5
+        adj_bins = 0
+        memory = []  # keeps track of all recycling bins already encountered
+        for tiles, chars_lst in self._grid.items():  # iterating each tile
+            char = chars_lst[0]
+            if isinstance(char, RecyclingBin) and (char not in memory):
+                neighbors = get_neighbours(tiles)
 
     # helper function that moves the character
     def move_character(self, char: Character,
                        pos1: Tuple[int, int], pos2: Tuple[int, int]) -> None:
-        """ Update the character character position from one to next
+        """ Update the character position from one to next
+
+        Precondition:
+        - pos1 and pos2 are on the board
+        - character currently exists in pos1
+        - character can move to pos2
+
+        >>> b = GameBoard(3, 2)
+        >>> r = Raccoon(b, 1, 0)
+        >>> p = Player(b, 0, 0)
+        >>> rb = RecyclingBin(b, 1, 1)
+        >>> b.move_character(r, (1, 0), (0, 1))
+        >>> b.at(0, 1)[0] == r
+        True
         """
-        self._grid[(pos1)].remove(char)
-        self._grid[(pos2)].append(char)
+        self._grid[pos1].remove(char)
+        self._grid[pos2].append(char)
 
 
 class Character:
@@ -841,7 +862,7 @@ class Raccoon(TurnTaker):
         next_y = self.y + direction[1]
 
         # check if next tile is on board
-        if not self.board.on_board(next_x, next_y):
+        if not self.board.on_board(next_x, next_y) or self.inside_can:
             return False
 
         # If the tile one tile over in that direction is occupied by the Player,
@@ -1025,8 +1046,8 @@ class SmartRaccoon(Raccoon):
         # using bubble sort to sort sorted_directions
         for i in range(4):
             for j in range(4 - i - 1):
-                if distances[sorted_directions[j]] > distances[
-                    sorted_directions[j + 1]]:
+                if distances[sorted_directions[j]] > \
+                        distances[sorted_directions[j + 1]]:
                     sorted_directions[j], sorted_directions[j + 1] = \
                         sorted_directions[j + 1], sorted_directions[j]
         return sorted_directions
