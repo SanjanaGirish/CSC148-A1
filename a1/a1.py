@@ -443,12 +443,38 @@ class GameBoard:
         5
         """
         # TODO Task #5
-        adj_bins = 0
-        memory = []  # keeps track of all recycling bins already encountered
-        for tiles, chars_lst in self._grid.items():  # iterating each tile
-            char = chars_lst[0]
-            if isinstance(char, RecyclingBin) and (char not in memory):
-                neighbors = get_neighbours(tiles)
+        # adj_bins = 0
+        # memory = []  # keeps track of all recycling bins already encountered
+        # for tiles, chars_lst in self._grid.items():   iterating each tile
+            # char = chars_lst[0]
+            # if isinstance(char, RecyclingBin) and (char not in memory):
+                # neighbors = get_neighbours(tiles)
+        # current_bins = 0
+        # max_bins = 0
+        for i in range(self.width):
+            for j in range(self.height):
+                if not (self.at(i, j) == []) and isinstance(self.at(i, j)[0], RecyclingBin):
+                    current_bins = self.adjacent_bins(i, j, {})
+                    max_bins = max(current_bins, max_bins)
+        return max_bins
+
+    # Helper function that calculates the adjacent recycling bins of a single
+    # recycling bin
+    def adjacent_bins(self, i: int, j: int, encountered) -> int:
+        """returns the number of bins that are adjacent to the recycling bin at
+        (i,j), returns 0, if no recycling bin in current square
+        """
+        b = 1
+        for direction in DIRECTIONS:
+            # checking if the current square has a recycling bin
+            if self.at(i, j) == [] or not isinstance(self.at(i, j)[0], RecyclingBin):
+                return 0
+            # if the adjacent square is in the board
+            if self.on_board(i + direction[0], j + direction[1]):
+                encountered[(i, j)] = True
+                if (i + direction[0], j + direction[1]) not in encountered:
+                    b += self.adjacent_bins(i + direction[0], j + direction[1], encountered)
+        return b
 
     # helper function that moves the character
     def move_character(self, char: Character,
