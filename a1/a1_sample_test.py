@@ -294,7 +294,22 @@ def test_simple_ge3() -> None:
 def test_simple_ge4() -> None:
     """ Test game ended with racoon in garbagecan"""
 
+    
+def test_adjacent_bins_score_no_bins() -> None:
+    """Test adjacent bins score with no recycling bins"""
+    g = GameBoard(3, 3)
+    assert g.adjacent_bin_score() == 0
 
+
+def test_adjacent_bins_score_all() -> None:
+    """Test adjacent bins score with all squares recycling bins"""
+    g = GameBoard(3, 3)
+    for i in range(g.width):
+        for j in range(g.height):
+            _ = RecyclingBin(g, i, j)
+    assert g.adjacent_bin_score() == 9
+
+    
 if __name__ == '__main__':
     import pytest
 
