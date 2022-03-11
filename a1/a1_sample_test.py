@@ -41,9 +41,9 @@ def width_more_than_height_setup() -> GameBoard:
     return b
 
 
-def height_more_than_width_setup()-> GameBoard:
+def height_more_than_width_setup() -> GameBoard:
     """Set up a game board with height greater than width"""
-    b = GameBoard(3,4)
+    b = GameBoard(3, 4)
     b.setup_from_grid(HEIGHT_MORE_THAN_WIDTH_STRING)
     return b
 
@@ -75,20 +75,20 @@ def test_simple_str() -> None:
     """Test GameBoard.__str__ for the simple board in SIMPLE_BOARD_STRING."""
     b = simple_board_setup()
     assert str(b) == 'P-B-\n-BRB\n--BB\n-C--'
-    
-    
+
+
 def test_width_greater_height_str() -> None:
     """Test GameBoard.__str__ for a board with width more than height"""
     b = width_more_than_height_setup()
     assert str(b) == WIDTH_MORE_THAN_HEIGHT_STRING
 
-    
+
 def test_height_greater_width_str() -> None:
     """Test GameBoard.__str__ for a board with height more than width"""
     b = height_more_than_width_setup()
     assert str(b) == HEIGHT_MORE_THAN_WIDTH_STRING
 
-    
+
 def test_simple_check_game_end() -> None:
     """Test GameBoard.check_game_end on the docstring example"""
     b = GameBoard(3, 2)
@@ -146,11 +146,11 @@ def test_simple_raccoon_check_trapped() -> None:
     assert not r.check_trapped()
     RecyclingBin(b, 1, 1)
     assert r.check_trapped()
-    
-    
+
+
 def test_corner_raccoon_check_trapped() -> None:
     """Test Raccoon.check_trapped when raccoon is in top-left corner"""
-    b = GameBoard(3,3)
+    b = GameBoard(3, 3)
     r = Raccoon(b, 0, 0)
     Player(b, 1, 0)
     RecyclingBin(b, 0, 1)
@@ -162,15 +162,15 @@ def test_garbage_can_raccoon_check_trapped() -> None:
     can. Also tests the case, when raccoon is not at an edge"""
     b = GameBoard(3, 3)
     r = Raccoon(b, 1, 1)
-    Player(b, 1, 0)
-    RecyclingBin(b, 0, 1)
+    _ = Player(b, 1, 0)
+    _ = RecyclingBin(b, 0, 1)
     g = GarbageCan(b, 1, 2, False)
-    Raccoon(b, 2, 1)
-    assert not r.check_trapped()
+    _ = Raccoon(b, 2, 1)
+    assert r.check_trapped() == False
     g.locked = True
-    assert r.check_trapped()
+    assert r.check_trapped() == True
 
-    
+
 def test_simple_raccoon_move() -> None:
     """Test Raccoon.move on docstring example."""
     b = GameBoard(4, 2)
@@ -228,6 +228,71 @@ def test_simple_give_turns() -> None:
     b.give_turns()
     assert (r.x, r.y) != (1, 1)  # Raccoon has had a turn!
     assert (p.x, p.y) == (1, 0)  # Player moved right!
+
+
+def test_simple_pc1() -> None:
+    """ Test place player character when gameboard empty"""
+    g = GameBoard(4, 3)
+    _ = Player(g, 0, 0)
+    g.place_character(_)
+    assert g.at(0, 0)[0] == _
+
+
+def test_simple_pc2() -> None:
+    """ Test place recyling bin character on occupied position"""
+    g = GameBoard(4, 3)
+    _ = Player(g, 0, 0)
+    rb = RecyclingBin(g, 0, 0)
+    g.place_character(_)
+    g.place_character(rb)
+    assert len(g.at(0, 0)) == 1
+
+
+def test_simple_pc3() -> None:
+    """ Test place racoon character on garbagecan - open and closed"""
+    g = GameBoard(4, 3)
+    g1 = GarbageCan(g, 0, 0, True)
+    _ = Raccoon(g, 0, 0)
+    assert len(g.at(0, 0)) == 1
+    g1.locked = False
+    _ = Raccoon(g, 0, 0)
+    assert len(g.at(0, 0)) == 2
+
+
+def test_simple_ge1() -> None:
+    """ Test game ended with empty neighboring tile"""
+    g = GameBoard(3, 3)
+    r = Raccoon(g, 1, 1)
+    RecyclingBin(g, 1, 0)
+    RecyclingBin(g, 0, 1)
+    RecyclingBin(g, 1, 2)
+    assert g.check_game_end() == None
+    assert g.ended == False
+
+
+def test_simple_ge2() -> None:
+    """ Test game ended with racoon in board corner"""
+    g = GameBoard(3, 3)
+    r = Raccoon(g, 0, 0)
+    RecyclingBin(g, 1, 0)
+    RecyclingBin(g, 0, 1)
+    assert g.check_game_end() != None
+    assert g.ended == True
+    assert g.check_game_end() == 11
+
+
+def test_simple_ge3() -> None:
+    """ Test game ended with racoon in garbagecan"""
+    g = GameBoard(3, 3)
+    GarbageCan(g, 0, 0, False)
+    Raccoon(g, 0, 0)
+    assert len(g.at(0, 0)) == 2
+    assert g.check_game_end() != None
+    assert g.ended == True
+
+
+def test_simple_ge4() -> None:
+    """ Test game ended with racoon in garbagecan"""
 
 
 if __name__ == '__main__':

@@ -418,10 +418,10 @@ class GameBoard:
                 # if it's a racoon and trapped
                 if isinstance(chars, Raccoon) and chars.check_trapped():
                     racoons_trapped += 1
-                # if it's a racoon, not trapped or not already in a can
+                # if it's a racoon, not trapped and not already in a can
                 elif isinstance(chars, Raccoon) and \
                         ((not chars.check_trapped())
-                         or (not len(chars_lst) == 2)):
+                         and (not len(chars_lst) == 2)):
                     self.ended = False
                     return None
         self.ended = True
