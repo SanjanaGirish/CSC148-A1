@@ -1075,6 +1075,27 @@ class SmartRaccoon(Raccoon):
                 if not self.board.at(j, self.y)[0].locked:
                     distances[LEFT] = self.x - j
                     break
+
+        distances.update(self._closest_up_down_gc(distances))
+
+        # using bubble sort to sort sorted_directions
+        for i in range(4):
+            for j in range(4 - i - 1):
+                if distances[sorted_directions[j]] > \
+                        distances[sorted_directions[j + 1]]:
+                    sorted_directions[j], sorted_directions[j + 1] = \
+                        sorted_directions[j + 1], sorted_directions[j]
+        return sorted_directions
+
+    def _closest_up_down_gc(self, distances: dict) -> dict:
+        """ Return the closest garbage can up and update the distances
+        dictionary
+        >>> b = GameBoard(5,5)
+        >>> s = SmartRaccoon(b, 2, 3)
+        >>> _ = GarbageCan(b, 0, 3, False)
+        >>> s._closest_up_down_gc({})
+        {}
+        """
         for j in range(self.y, -1, -1):
             if len(self.board.at(self.x, j)) == 1 and isinstance(
                     self.board.at(self.x, j)[0], GarbageCan):
@@ -1087,14 +1108,7 @@ class SmartRaccoon(Raccoon):
                 if not self.board.at(self.x, j)[0].locked:
                     distances[DOWN] = j - self.y
                     break
-        # using bubble sort to sort sorted_directions
-        for i in range(4):
-            for j in range(4 - i - 1):
-                if distances[sorted_directions[j]] > \
-                        distances[sorted_directions[j + 1]]:
-                    sorted_directions[j], sorted_directions[j + 1] = \
-                        sorted_directions[j + 1], sorted_directions[j]
-        return sorted_directions
+        return distances
 
     def get_char(self) -> chr:
         """
