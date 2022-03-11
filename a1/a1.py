@@ -365,6 +365,11 @@ class GameBoard:
         >>> g = GameBoard(3, 3)
         >>> g.all_characters()
         []
+        >>> r = Raccoon(g, 0, 0)
+        >>> gb = GarbageCan(g, 1, 1, False)
+        >>> rb = RecyclingBin(g, 2, 2)
+        >>> p = Player(g, 2, 1)
+        >>> assert len(g.all_characters()) == 4
         """
         lst_of_chars = []
         for char_lst in self._grid.values():
@@ -410,14 +415,15 @@ class GameBoard:
         racoons_trapped = 0
         for chars_lst in self._grid.values():
             for chars in chars_lst:
-                # if it's a racoon, not trapped and not already in a can
-                if isinstance(chars, Raccoon) and (not chars.check_trapped()) \
-                        and (not len(chars_lst) == 2):
+                # if it's a racoon and trapped
+                if isinstance(chars, Raccoon) and chars.check_trapped():
+                    racoons_trapped += 1
+                # if it's a racoon, not trapped or not already in a can
+                elif isinstance(chars, Raccoon) and \
+                        ((not chars.check_trapped())
+                         or (not len(chars_lst) == 2)):
                     self.ended = False
                     return None
-                # if it's a racoon and trapped
-                elif isinstance(chars, Raccoon) and chars.check_trapped():
-                    racoons_trapped += 1
         self.ended = True
         # Can test the line below only after TASK 5 is implemented
         return racoons_trapped * 10 + self.adjacent_bin_score()
