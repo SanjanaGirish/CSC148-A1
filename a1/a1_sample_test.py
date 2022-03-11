@@ -294,6 +294,42 @@ def test_simple_ge3() -> None:
 def test_simple_ge4() -> None:
     """ Test game ended with racoon in garbagecan"""
 
+
+def test_smart_raccoon_turn_taker_closed() -> None:
+    """ Testing SmartRaccoon.turn_taker, when the closest GarbageCan
+    is closed also tests whether the smart raccoon opens the garbage can if
+    locked."""
+    g = GameBoard(5,5)
+    r = SmartRaccoon(g, 2, 2)
+    _ = GarbageCan(g, 1, 2, True)
+    t = _
+    _ = GarbageCan(g, 2, 1, False)
+    r.take_turn()
+    assert r.x == 2 and r.y == 2
+    assert not t.locked
+
+
+def test_smart_raccoon_turn_taker_closed2() -> None:
+    """ Testing SmartRaccoon.turn_taker, when the closest GarbageCan
+    is closed"""
+    g = GameBoard(5, 5)
+    r = SmartRaccoon(g, 2, 2)
+    _ = GarbageCan(g, 0, 2, True)
+    _ = GarbageCan(g, 2, 0, False)
+    r.take_turn()
+    assert r.x == 1 and r.y == 2
+
+
+def test_smart_raccoon_turn_taker_closed3() -> None:
+    """ Testing SmartRaccoon.turn_taker, when the closest GarbageCan
+    is closed"""
+    g = GameBoard(5, 5)
+    r = SmartRaccoon(g, 2, 2)
+    _ = GarbageCan(g, 0, 2, True)
+    _ = GarbageCan(g, 2, 1, False)
+    r.take_turn()
+    assert r.x == 2 and r.y == 1
+    
     
 def test_adjacent_bins_score_no_bins() -> None:
     """Test adjacent bins score with no recycling bins"""
