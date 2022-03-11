@@ -1072,15 +1072,13 @@ class SmartRaccoon(Raccoon):
         for j in range(self.x, self.board.width):
             if len(self.board.at(j, self.y)) == 1 and isinstance(
                     self.board.at(j, self.y)[0], GarbageCan):
-                if not self.board.at(j, self.y)[0].locked:
-                    distances[RIGHT] = j - self.x
-                    break
+                distances[RIGHT] = j - self.x
+                break
         for j in range(self.x, -1, -1):
             if len(self.board.at(j, self.y)) == 1 and isinstance(
                     self.board.at(j, self.y)[0], GarbageCan):
-                if not self.board.at(j, self.y)[0].locked:
-                    distances[LEFT] = self.x - j
-                    break
+                distances[LEFT] = self.x - j
+                break
 
         distances.update(self._closest_up_down_gc(distances))
 
@@ -1105,15 +1103,13 @@ class SmartRaccoon(Raccoon):
         for j in range(self.y, -1, -1):
             if len(self.board.at(self.x, j)) == 1 and isinstance(
                     self.board.at(self.x, j)[0], GarbageCan):
-                if not self.board.at(self.x, j)[0].locked:
-                    distances[UP] = self.y - j
-                    break
+                distances[UP] = self.y - j
+                break
         for j in range(self.y, self.board.height):
             if len(self.board.at(self.x, j)) == 1 and isinstance(
                     self.board.at(self.x, j)[0], GarbageCan):
-                if not self.board.at(self.x, j)[0].locked:
-                    distances[DOWN] = j - self.y
-                    break
+                distances[DOWN] = j - self.y
+                break
         return distances
 
     def get_char(self) -> chr:
